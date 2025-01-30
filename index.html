@@ -44,7 +44,7 @@
         <button id="startButton" class="btn btn-light mb-3">Start Game</button>
         <p id="score">Score: 0</p>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <p class="mt-3 text-white">Use Arrow keys to play</p>
+        <p class="mt-3 text-white">Use Arrow keys, swipe, or mouse to play</p>
     </div>
 
     <script>
@@ -73,8 +73,67 @@
 
         startButton.addEventListener("click", initGame);
 
+        // For arrow key control
         document.addEventListener("keydown", changeDirection);
         
+        // For touch swipe control
+        let touchStartX, touchStartY;
+
+        canvas.addEventListener("touchstart", (e) => {
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        });
+
+        canvas.addEventListener("touchmove", (e) => {
+            e.preventDefault(); // Prevent the default scroll behavior
+            const touch = e.touches[0];
+            const diffX = touch.clientX - touchStartX;
+            const diffY = touch.clientY - touchStartY;
+
+            if (Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0 && direction !== "LEFT") {
+                    direction = "RIGHT";
+                } else if (diffX < 0 && direction !== "RIGHT") {
+                    direction = "LEFT";
+                }
+            } else {
+                if (diffY > 0 && direction !== "UP") {
+                    direction = "DOWN";
+                } else if (diffY < 0 && direction !== "DOWN") {
+                    direction = "UP";
+                }
+            }
+
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        });
+
+        // For mouse cursor control
+        canvas.addEventListener("mousemove", (e) => {
+            const mouseX = e.offsetX;
+            const mouseY = e.offsetY;
+
+            // Calculate direction based on the position of the mouse relative to the snake's head
+            const snakeHead = snake[0];
+            const dx = mouseX - snakeHead.x;
+            const dy = mouseY - snakeHead.y;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 0 && direction !== "LEFT") {
+                    direction = "RIGHT";
+                } else if (dx < 0 && direction !== "RIGHT") {
+                    direction = "LEFT";
+                }
+            } else {
+                if (dy > 0 && direction !== "UP") {
+                    direction = "DOWN";
+                } else if (dy < 0 && direction !== "DOWN") {
+                    direction = "UP";
+                }
+            }
+        });
+
         function changeDirection(event) {
             const key = event.keyCode;
             if (key === 37 && direction !== "RIGHT") direction = "LEFT";
